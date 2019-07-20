@@ -13,7 +13,7 @@ export default class App extends React.Component {
       date: '',
       email:'',
       requestedPrice: '',
-       
+      ticketsFound: []
     }
   }
 
@@ -35,10 +35,11 @@ export default class App extends React.Component {
     })
     .then((res) => {
       console.log('sendback', this.state)
+      console.log(res.data);
       this.setState({
-        bandName: '',
+        ticketsFound: res.data.events
       })
-      console.log('41', this.state)
+
     })
 
   }
@@ -57,7 +58,6 @@ export default class App extends React.Component {
   }
 
   render() {
-    console.log('60', this.state)
     return (
       <div>
        <form onSubmit={this.handleSubmit}>
@@ -71,6 +71,11 @@ export default class App extends React.Component {
           <input onChange={this.handleChange} type="text" id="requestedPrice" name="requestedPrice" data-type='requestedPrice' placeholder="Price"/>
           <input type="submit" value="Begin Search"/>
         </form>
+        {this.state.ticketsFound.map((x) => {
+          return(
+          <div> {x.description} </div>  
+          )
+        })}
       </div>
     )
   }
