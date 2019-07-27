@@ -32,104 +32,78 @@ function price_poller() {
         model: models.Event
       }
     ]
-  }).then(blegh => {
-    blegh
-      .forEach(x => {
-        stubhubUrl = x.Event.dataValues.url;
-        stubhubEventId = stubhubUrl.split("/");
-        realStubhubId = stubhubEventId[4];
+  }).then(userEventRow => {
+    userEventRow.forEach(userEvent => {
+      stubhubUrl = userEvent.Event.dataValues.url;
+      stubhubEventId = stubhubUrl.split("/");
+      realStubhubId = stubhubEventId[4];
 
-        if (x.fulfilled == false) {
-          axios
-            .get("https://api.stubhub.com/sellers/search/events/v3", {
-              params: {
-                id: realStubhubId
-              }
-            })
-            .then(stubhubRes => {
-              let promiseGetEvents = stubhubRes.data.events.map(x => {
-                var lowestPrice = x.ticketInfo.minListPrice; //gets the minimum price for tickets
-                var obtainedUrl = `https://www.stubhub.com/event/${x.id}`;
-                //dictionary for lowest price and id?
+      if (userEvent.fulfilled === false) {
+        axios
+          .get("https://api.stubhub.com/sellers/search/events/v3", {
+            params: {
+              id: realStubhubId
+            }
+          })
+          .then(stubhubRes => {
+            let sendEmailAndFulfill = stubhubRes.data.events.map(
+              stubhubEvent => {
+                var lowestPrice = stubhubEvent.ticketInfo.minListPrice; //gets the minimum price for tickets
+                var requestedPrice = userEvent.dataValues.requestedPrice;
 
-                return new Promise(function(resolve, reject) {
-                  models.Event.findOne({
-                    where: {
-                      url: obtainedUrl
-                    },
-                    include: [
-                      {
-                        model: models.User_event,
-                        include: [
-                          {
-                            model: models.User
+                console.log(lowestPrice, requestedPrice)
+
+                if (lowestPrice <= requestedPrice) {
+                  console.log('this is requestedPrice:lowestPrice', requestedPrice, ':', lowestPrice)
+                  return new Promise(function(resolve, reject) {
+                    let msg = {
+                      to: "test@example.com", //`${y.User.email}`,
+                      from: "test@example.com",
+                      subject: "Your Tickets are ready to be bought!",
+                      text: "and easy to do anywhere, even with Node.js",
+                      html:
+                        "<strong>and easy to do anywhere, even with Node.js</strong>"
+                    };
+                    sgMail.send(msg)
+                    .then((data) => {
+                      return models.User_event.update(
+                        {
+                          fulfilled: true
+                        },
+                        {
+                          where: {
+                            id: userEvent.dataValues.id
                           }
-                        ]
-                      }
-                    ]
-                  })
-                    .then(event => {
-                      resolve([event, lowestPrice]);
-                    })
-                    .catch(err => {
-                      reject(err);
-                    });
-                });
-              });
-              return Promise.all(promiseGetEvents);
-            })
-            .then(values => {
-              let promises = [];
-              values.forEach(res => {
-                let x = res[0];
-                let lowestPrice = res[1];
-                let event = x.dataValues;
-                let userEvents = event.User_events;
-                userEvents.forEach(y => {
-                  let requestedPrice = y.dataValues.requestedPrice;
-                  if (requestedPrice < parseFloat(lowestPrice)) {
-                    promises.push(
-                      new Promise(function(resolve, reject) {
-                        let msg = {
-                          to: "test@example.com", //`${y.User.email}`,
-                          from: "test@example.com",
-                          subject: "Your Tickets are ready to be bought!",
-                          text: "and easy to do anywhere, even with Node.js",
-                          html:
-                            "<strong>and easy to do anywhere, even with Node.js</strong>"
-                        };
-                        sgMail.send(msg).then(data => {
-                          models.User_event.update(
-                            {
-                              fulfilled: true
-                            },
-                            {
-                              where: {
-                                id: y.dataValues.id
-                              }
-                            }
-                          ).then(() => {
-                            resolve();
-                          });
-                        });
+                        }
+                      ).then(() => {
+                        return true;
                       })
-                    );
-                  }
-                });
+                      .catch(() => {
+                        return false;
+                      })
+                    })
+                    .then(() => {
+                      return true
+                    })
+                    .then((fulfilled) => {
+                      resolve(fulfilled);
+                    })
+                  });
+                }
+                return;
               });
-              return Promise.all(promises);
-            })
-            .then(() => {
-              console.log("successfully sent email");
-              return;
-            })
-            .catch(err => {
-              console.log("Promise err", err);
-              return;
-            });
-        }
-      })
-      
+              return Promise.all(sendEmailAndFulfill);
+          })
+          .then((values) => {
+            console.log("successfully sent emails", values);
+            return;
+          })
+          .catch(err => {
+            console.log("Promise err", err);
+            return;
+          });
+      }
+    });
   });
 }
 
