@@ -9,6 +9,7 @@
     "css-minify": "grunt build"
   },
   "dependencies": {
+    "@sendgrid/mail": "^6.4.0",
     "axios": "^0.18.0",
     "babel-core": "^6.17.0",
     "bcrypt-nodejs": "0.0.3",

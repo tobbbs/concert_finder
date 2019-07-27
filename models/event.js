@@ -5,7 +5,6 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   Event.associate = function(models) {
     // associations can be defined here
-    console.log(models);
     Event.hasMany(models.User_event, {foreignKey: 'eventId'})
 
   };

@@ -7,10 +7,9 @@ var bodyParser = require('body-parser');
 var passport = require('passport');
 var session = require('express-session');
 var models = require("./models");
-require('dotenv').config()
-var port = 5000;
+require('dotenv').config();
+var port = 3000;
 
-console.log('process', process)
 
 var routes = require('./routes/index');
 

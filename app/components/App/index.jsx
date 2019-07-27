@@ -7,13 +7,14 @@ export default class App extends React.Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleDataInput = this.handleDataInput.bind(this);
 
     this.state = {
       bandName: '',
       date: '',
       email:'',
       requestedPrice: '',
-      ticketsFound: []
+      ticketsFound: [],
     }
   }
 
@@ -44,6 +45,8 @@ export default class App extends React.Component {
 
   }
 
+
+
   handleChange(event) {
     console.log('change worked', this.state);
     const type = event.target.dataset.type;
@@ -53,14 +56,37 @@ export default class App extends React.Component {
     this.setState({
      [type]: value
     }); 
+   
+  }
 
 
+
+  handleDataInput(e) {
+    console.log('datainput state', this.state)
+    console.log(e.target.id);
+    console.log("bandname", bandName)
+    var context = this.state;
+    context.eventId = e.target.id;
+    axios.post('/data_input', context)
+    .then(() => {
+      //go to a confirmation page
+    });
   }
 
   render() {
+    var context = this;
     return (
       <div>
        <form onSubmit={this.handleSubmit}>
+
+       {this.state.ticketsFound.map((x) => {
+         return(
+         <div onClick={context.handleDataInput} id={x.id}> 
+           {x.description}
+           {x.ticketInfo.minListPrice} 
+         </div>
+         )
+       })}
           <label for="bandName">Band name</label>
           <input onChange={this.handleChange} type="text" id="bandName" name="bandName" data-type='bandName' placeholder="Band Name"/>
           <label for="date"> Date of concert </label>
@@ -71,11 +97,6 @@ export default class App extends React.Component {
           <input onChange={this.handleChange} type="text" id="requestedPrice" name="requestedPrice" data-type='requestedPrice' placeholder="Price"/>
           <input type="submit" value="Begin Search"/>
         </form>
-        {this.state.ticketsFound.map((x) => {
-          return(
-          <div> {x.description} </div>  
-          )
-        })}
       </div>
     )
   }
