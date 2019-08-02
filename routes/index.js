@@ -4,7 +4,6 @@ const models = require("../models");
 const axios = require("axios");
 const moment = require("moment");
 
-axios.defaults.headers.common['Authorization'] = `Bearer ${process.env.STUBHUB_BEARER_TOKEN}`;
 
 
 router.get('/', function(req, res, next) {
@@ -102,11 +101,23 @@ function stubhubApi(req, res, next) {
 
         dateLocal: req.body.date + " TO " + tomorrow, 
         performerName: req.body.bandName
-      }
+      },
+      headers: { 'Authorization': `Bearer ${process.env.STUBHUB_BEARER_TOKEN}`}
   })
   .then((stubhubRes) =>{
     req.body["stubhub"] = stubhubRes.data;
     return next();
+  })
+}
+function seatgeekApi(req, res, next) {
+  var today = moment(req.body.date, "YYYY-MM-DD")
+  var tomorrow = moment(today).add(1, 'days').format('YYYY-MM-DD');
+
+  axios.get('https://api.seatgeek.com/2', {
+    params: {
+      datetime_local: req.body.date + "&" + tomorrow
+      performer.name: req.body.bandName 
+    }
   })
 }
 

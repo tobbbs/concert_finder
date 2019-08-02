@@ -2,7 +2,7 @@ const GeneralApi = require("./generalApi");
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const axios = require("axios");
+const axios = require('axios');
 const path = require("path");
 
 require("dotenv").config({
@@ -11,8 +11,9 @@ require("dotenv").config({
 
 class StubhubApi extends GeneralApi {
     constructor(name, apiUrl, envToken) {
-        super(name, apiUrl, envToken); // call the super class constructor and pass in the name parameter
-        axios.defaults.headers.common["Authorization"] = `Bearer ${envToken}`;
+        axiosInstance = axios.create();
+        super(name, apiUrl, envToken, axiosInstance); // call the super class constructor and pass in the name parameter
+        console.log(this.axios.defaults.headers);
       }
     getEventId(url) {
         return url.split('/')[4]

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const axios = require("axios");
 const path = require("path");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config({
@@ -9,9 +8,10 @@ require("dotenv").config({
 });
 
 class GeneralApi {
-    constructor(name, apiURL, envToken) {
+    constructor(name, apiURL, envToken, axiosInstance) {
         this.name = name;
         this.apiURL = apiURL;
+        this.axios = axiosInstance;
       
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         console.log(process.env.SENDGRID_API_KEY, 'sendgrid');
@@ -52,12 +52,14 @@ class GeneralApi {
 
     fetchDataFromApi(userEventRow) {
         let promises = [];
+        let context = this;
         userEventRow.forEach(userEvent => {
             let {url: eventURL} = userEvent.Event.dataValues;
             let eventId = this.getEventId(eventURL);
 
             if (!userEvent.fulfilled) {
-                promises.push(axios.get(this.apiURL, {
+                console.log('Axios', context.axios.defaults.headers.common)
+                promises.push(context.axios.get(this.apiURL, {
                     params: {
                         id: eventId
                     }
@@ -66,6 +68,7 @@ class GeneralApi {
                 }).then((values) => {
                     return values;
                 }).catch(err => {
+                    //console.log('error', err)
                     return err;
                 }));
             }
