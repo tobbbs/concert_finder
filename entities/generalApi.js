@@ -8,10 +8,10 @@ require("dotenv").config({
 });
 
 class GeneralApi {
-    constructor(name, apiURL, envToken, axiosInstance) {
+    constructor(name, apiURL, envToken) {
         this.name = name;
         this.apiURL = apiURL;
-        this.axios = axiosInstance;
+        this.envToken;
       
         sgMail.setApiKey(process.env.SENDGRID_API_KEY);
         console.log(process.env.SENDGRID_API_KEY, 'sendgrid');
@@ -27,7 +27,8 @@ class GeneralApi {
             text: `Buy it here! ${eventURL}`,
             html: `<strong>Buy it here! ${eventURL}</strong>`
         };
-        return sgMail.send(msg).then((data) => {
+        //return sgMail.send(msg)
+        //.then((data) => {
             return models.User_event.update({
                 fulfilled: true
             }, {
@@ -38,7 +39,7 @@ class GeneralApi {
             .catch((err) => {
                 return err;
             })
-        });
+        //});
     }
 
     getEventId(url) {
