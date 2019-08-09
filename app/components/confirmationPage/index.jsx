@@ -14,8 +14,11 @@ export default class confirmationPage extends React.Component {
     
     return (
       <div id="background">
+        <center>
+        <div className='pageTitle'> Scalper, No Scalping </div>
+        <img src='/scalper_icon.png' id='scalper'/>
         confirmation that u r tracking these things
-      
+        </center>
         <hr class="f"/>    
             <div className='footer'>
             <a href="https://www.instagram.com/tobinleung/?hl=en"><img src="https://mpng.pngfly.com/20180705/fai/kisspng-instagram-logo-computer-icons-insta-logo-5b3dd0b627ad89.2825955615307777821625.jpg" title="Instagram" id="Instagram" /></a>
