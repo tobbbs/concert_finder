@@ -18,7 +18,9 @@ let seatgeekApi = new SeatgeekApi(
 router.get("/", function(req, res, next) {
   return res.render("index");
 });
-
+router.get("/confirmationPage", function(req, res, next) {
+  return res.render("index");
+});
 router.post(
   "/pull_ticket",
   [stubhubApi.fetchevents, seatgeekApi.fetchevents],
@@ -115,7 +117,7 @@ router.post("/data_input", function(req, res, next) {
           return Promise.all(promises);
         })
         .then((x) => {
-          console.log('this is x ', x)
+          console.log('this is x ', x, req.body)
           res.send(200, req.body);
         });
     });

@@ -91,6 +91,7 @@ export default class App extends React.Component {
     this.setState({
       checkEvents: checkedEvents
     });
+
   }
   confirmEvents(e) {
     e.preventDefault();
@@ -101,96 +102,144 @@ export default class App extends React.Component {
     axios
       .post("/data_input", context)
 
-      .then(res => {
-        console.log("finally went through");
+      .then((res) => {
+        console.log("finally went through", res);
+        window.location = '/confirmationPage';
       });
+  }
+
+  renderEventsFound() {
+    var context = this;
+    var artistName = this.state.bandName;
+    return (
+      <div className='eventsFound'>
+      <center> Select the events you want to keep an eye on! </center>
+      <hr/>
+      <form onSubmit={this.handleTrack}>
+        {this.state.ticketsFoundStubhub.map(x => {
+          return (
+            <div className="checkboxItems">
+              <input
+                className=" col-md-3 checkbox"
+                type="checkbox"
+                id={x.id}
+                data-url={x.webURI}
+                onChange={this.handleTrack}
+              />
+              <label className=" col-md-9 custom-control-label" for="defaultChecked2">
+                {x.description}  
+                <div></div>
+                Current lowest price: $
+                {x.ticketInfo.minListPrice}{" "}
+              </label>
+            </div>
+          );
+        })}
+        {this.state.ticketsFoundSeatgeek.map(x => {
+          return (
+            <div className="checkboxItems">
+              <input
+                className='col-md-3 checkbox'
+                type="checkbox"
+                id={x.id}
+                data-url={x.url}
+                onChange={this.handleTrack}
+              />
+              <label className=" col-md-9 custom-control-label" for="defaultChecked2">
+                {artistName} performing at &nbsp; 
+                {x.venue.name}
+                <div></div>
+                Current lowest price: ${x.stats.lowest_price}{" "}
+              </label>
+            </div>
+          ); 
+        })}
+
+        <center><input
+          className='col-md-12'
+          type="submit"
+          id="confirmEvent"
+          onClick={this.confirmEvents}
+          value="Watch these pages"
+        />
+        </center>
+       </form>
+    </div>  
+    )
   }
 
   render() {
     var context = this;
-    var artistName = this.state.bandName;
+    let {ticketsFoundSeatgeek, ticketsFoundStubhub} =this.state;
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <label for="bandName">Band name</label>
-          <input
-            onChange={this.handleChange}
-            type="text"
-            id="bandName"
-            name="bandName"
-            data-type="bandName"
-            placeholder="Band Name"
-          />
-          <label for="date"> Date of concert </label>
-          <input
-            onChange={this.handleChange}
-            type="date"
-            name="date"
-            data-type="date"
-          />
-          <label for="email"> Contact email </label>
-          <input
-            onChange={this.handleChange}
-            type="text"
-            id="email"
-            name="email"
-            data-type="email"
-            placeholder="Email Address"
-          />
-          <label for="requestedPrice"> How much do you want to pay?</label>
-          <input
-            onChange={this.handleChange}
-            type="text"
-            id="requestedPrice"
-            name="requestedPrice"
-            data-type="requestedPrice"
-            placeholder="Price"
-          />
-          <input type="submit" value="Begin Search" />
-        </form>
-        <form onSubmit={this.handleTrack}>
-          {this.state.ticketsFoundStubhub.map(x => {
-            return (
-              <div class="checkboxItems">
-                <input
-                  type="checkbox"
-                  id={x.id}
-                  data-url={x.webURI}
-                  onChange={this.handleTrack}
-                />
-                <label class="custom-control-label" for="defaultChecked2">
-                  {x.description} Current lowest price:{" "}
-                  {x.ticketInfo.minListPrice}{" "}
-                </label>
+      <div id="background">
+        <center>
+        <div className='pageTitle'> Scalper, No Scalping </div>
+        <img src='/scalper_icon.png' id='scalper'/>
+        <div className='inputBoxContainer'>
+          <form onSubmit={this.handleSubmit}>
+          <div className='dataInput'>
+            <label className='inputBoxTitle' for="bandName">Band name</label>
+              <div><input
+              className='inputBox'
+              onChange={this.handleChange}
+              type="text"
+              id="bandName"
+              name="bandName"
+              data-type="bandName"
+              placeholder="Band Name"
+              autoFocus
+              />
               </div>
-            );
-          })}
-          {this.state.ticketsFoundSeatgeek.map(x => {
-            return (
-              <div class="checkboxItems">
-                <input
-                  type="checkbox"
-                  id={x.id}
-                  data-url={x.url}
-                  onChange={this.handleTrack}
-                />
-                <label class="custom-control-label" for="defaultChecked2">
-                  {artistName} performing at
-                  {x.venue.name}
-                  Current lowest price: {x.stats.lowest_price}{" "}
-                </label>
+          </div>
+          <div className='dataInput'>
+            <label className='inputBoxTitle' for="date"> Date of concert </label>
+              <div><input
+              className='inputBox'
+              onChange={this.handleChange}
+              type="date"
+              name="date"
+              data-type="date"
+              />
               </div>
-            );
-          })}
-
-          <input
-            type="submit"
-            onClick={this.confirmEvents}
-            id="confirmEvent"
-            value="Watch these pages"
-          />
+          </div>
+          <div className='dataInput'>
+            <label className='inputBoxTitle' for="email"> Contact email </label>
+            <div><input
+              className='inputBox'
+              onChange={this.handleChange}
+              type="text"
+              id="email"
+              name="email"
+              data-type="email"
+              placeholder="Email Address"
+              />
+              </div>
+          </div>
+          <div className='dataInput'>
+            <label className='inputBoxTitle' for="requestedPrice"> How much do you want to pay?</label>
+            <div><input
+              className='inputBox'
+              onChange={this.handleChange}
+              type="text"
+              id="requestedPrice"
+              name="requestedPrice"
+              data-type="requestedPrice"
+              placeholder="Price"
+              />
+              </div>
+          </div>
+          <input type="submit" id='eventSearch' value="Begin Search" />
         </form>
-      </div>
+        </div>
+        </center>
+      {ticketsFoundSeatgeek.length || ticketsFoundStubhub.length ? this.renderEventsFound() : <div></div>}
+      <hr class="f"/>    
+            <div className='footer'>
+            <a href="https://www.instagram.com/tobinleung/?hl=en"><img src="https://mpng.pngfly.com/20180705/fai/kisspng-instagram-logo-computer-icons-insta-logo-5b3dd0b627ad89.2825955615307777821625.jpg" title="Instagram" id="Instagram" /></a>
+            © 2019 Tobin Leung. Made in YVR
+            </div>
+     </div>
     );
   }
 }
