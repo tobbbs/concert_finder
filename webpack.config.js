@@ -25,7 +25,7 @@ var config = {
   module: {
     loaders: [{
       test: /\.jsx$/,
-      loader: 'babel',
+      loader: 'babel-loader',
       include: APP_DIR,
       query: {
         presets: ['es2015', 'react']

@@ -8,8 +8,9 @@ var passport = require('passport');
 var session = require('express-session');
 var models = require("./models");
 require('dotenv').config();
-var port = 3000;
 
+
+var port = process.env.PORT || 3000;
 
 var routes = require('./routes/index');
 
